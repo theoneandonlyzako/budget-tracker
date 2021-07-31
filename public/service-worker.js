@@ -1,6 +1,7 @@
 const APP_PREFIX = 'BudgetTracker-';
 const VERSION = 'version_01';
 const CACHE_NAME = APP_PREFIX + VERSION;
+const DATA_CACHE_NAME = "data-cache-" + VERSION;
 
 const FILES_TO_CACHE = [
   "/",
@@ -41,71 +42,41 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-self.addEventListener('fetch', function (e) {
-  console.log('fetch request : ' + e.request.url)
+//Retrieve info from the cache
+//listen for the fetch event
+self.addEventListener('fetch', function(e) {
+  // //log the URL of the requested resource
+  // console.log('fetch request : ' + e.request.url)
+ // cache all get requests to /api routes
+ if (e.request.url.includes("/api/")) {
   e.respondWith(
-    caches.match(e.request).then(function (request) {
-      if (request) { // if cache is available, respond with cache
-        console.log('responding with cache : ' + e.request.url)
-        return request
-      } else {       // if there are no cache, try fetching request
-        console.log('file is not cached, fetching : ' + e.request.url)
-        return caches.match(e.request)
+    caches.open(DATA_CACHE_NAME).then(cache => {
+      return fetch(e.request)
+        .then(response => {
+          // If the response was good, clone it and store it in the cache.
+          if (response.status === 200) {
+            cache.put(e.request.url, response.clone());
+          }
+          return response;
+        })
+        .catch(err => {
+          // Network request failed, try to get it from the cache.
+          return cache.match(e.request);
+        });
+    }).catch(err => console.log(err))
+  );
+  return;
+ }
+ e.respondWith(
+  fetch(e.request).catch(function() {
+    return caches.match(e.request).then(function(response) {
+      if (response) {
+        return response;
+      } else if (e.request.headers.get("accept").includes("text/html")) {
+        // return the cached home page for all requests for html pages
+        return caches.match("/");
       }
-    })
-  )
-});
-
-// remove old caches
-// self.addEventListener("activate", (event) => {
-//   // waitUntil
-//   event.waitUntil(
-//     // caches.keys
-//     caches.keys().then((keyList) => {
-//        // will give a Key List
-//       return Promise.all(
-//         keyList.map((key) => {
-//           if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-//             // if nothing in the keep list, delete item 
-//             return caches.delete(key);
-//           }
-//         })
-//       );
-//     })
-//   );
-//   //takes control over service worker on the first load
-//   self.clients.claim();
-// });
-
-// self.addEventListener('activate', function(event) {
-//   // waitUntil
-//   event.waitUntil(
-//     // caches.keys
-//     caches.keys().then(function(cacheNames) {
-//       // will give a Key List
-//       return Promise.all(
-//         // filter out APP_PREFIX (.map)
-//         cacheNames.filter(function(cacheName) {
-//           // Return true if you want to remove this cache,
-//           // but remember that caches are shared across
-//           // the whole origin
-//         }).map(function(cacheName) {
-//           return caches.delete(cacheName);
-//         })
-//       );
-//     })
-//     // if nothing in the keep list, delete item 
-//   );
-// });
-
-// self.addEventListener('delete', function() {
-//   console.log('deleting cache')
-
-//   // waitUntil
-//   // caches.keys
-//   // will give a Key List
-//   // filter out APP_PREFIX (.map)
-//   // make a keep list 
-//   // if nothing in the keep list, delete item 
-  
-// })
+    });
+  })
+ );
+ })
