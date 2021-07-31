@@ -9,7 +9,6 @@ const FILES_TO_CACHE = [
   "./icons/icon-192x192.png",
   "./icons/icon-512x512.png",
   "./assets/js/db.js",
-  "./assets/js/index.js",
   "./js/index.js"
 ];
 
@@ -57,10 +56,10 @@ self.addEventListener('fetch', function (e) {
   )
 });
 
-// // remove old caches
+// remove old caches
 // self.addEventListener("activate", (event) => {
 //   // waitUntil
-//   evt.waitUntil(
+//   event.waitUntil(
 //     // caches.keys
 //     caches.keys().then((keyList) => {
 //        // will give a Key List
@@ -102,11 +101,11 @@ self.addEventListener('fetch', function (e) {
 // self.addEventListener('delete', function() {
 //   console.log('deleting cache')
 
-//   waitUntil
-//   caches.keys
-//   will give a Key List
-//   filter out APP_PREFIX (.map)
-//   make a keep list 
-//   if nothing in the keep list, delete item 
+//   // waitUntil
+//   // caches.keys
+//   // will give a Key List
+//   // filter out APP_PREFIX (.map)
+//   // make a keep list 
+//   // if nothing in the keep list, delete item 
   
 // })
