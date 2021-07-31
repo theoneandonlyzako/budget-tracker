@@ -57,14 +57,56 @@ self.addEventListener('fetch', function (e) {
   )
 });
 
-self.addEventListener('delete', function() {
-  console.log('deleting cache')
+// // remove old caches
+// self.addEventListener("activate", (event) => {
+//   // waitUntil
+//   evt.waitUntil(
+//     // caches.keys
+//     caches.keys().then((keyList) => {
+//        // will give a Key List
+//       return Promise.all(
+//         keyList.map((key) => {
+//           if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+//             // if nothing in the keep list, delete item 
+//             return caches.delete(key);
+//           }
+//         })
+//       );
+//     })
+//   );
+//   //takes control over service worker on the first load
+//   self.clients.claim();
+// });
 
-  // waitUntil
-  // caches.keys
-  // will give a Key List
-  // filter out APP_PREFIX (.map)
-  // make a keep list 
-  // if nothing in the keep list, delete item 
+// self.addEventListener('activate', function(event) {
+//   // waitUntil
+//   event.waitUntil(
+//     // caches.keys
+//     caches.keys().then(function(cacheNames) {
+//       // will give a Key List
+//       return Promise.all(
+//         // filter out APP_PREFIX (.map)
+//         cacheNames.filter(function(cacheName) {
+//           // Return true if you want to remove this cache,
+//           // but remember that caches are shared across
+//           // the whole origin
+//         }).map(function(cacheName) {
+//           return caches.delete(cacheName);
+//         })
+//       );
+//     })
+//     // if nothing in the keep list, delete item 
+//   );
+// });
+
+// self.addEventListener('delete', function() {
+//   console.log('deleting cache')
+
+//   waitUntil
+//   caches.keys
+//   will give a Key List
+//   filter out APP_PREFIX (.map)
+//   make a keep list 
+//   if nothing in the keep list, delete item 
   
-})
+// })
