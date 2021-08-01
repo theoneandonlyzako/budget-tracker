@@ -44,39 +44,39 @@ self.addEventListener('activate', function (e) {
 
 //Retrieve info from the cache
 //listen for the fetch event
-self.addEventListener('fetch', function(e) {
+self.addEventListener('fetch', function (e) {
   // //log the URL of the requested resource
   // console.log('fetch request : ' + e.request.url)
- // cache all get requests to /api routes
- if (e.request.url.includes("/api/")) {
+  // cache all get requests to /api routes
+  if (e.request.url.includes("/api/")) {
+    e.respondWith(
+      caches.open(DATA_CACHE_NAME).then(cache => {
+        return fetch(e.request)
+          .then(response => {
+            // If the response was good, clone it and store it in the cache.
+            if (response.status === 200) {
+              cache.put(e.request.url, response.clone());
+            }
+            return response;
+          })
+          .catch(err => {
+            // Network request failed, try to get it from the cache.
+            return cache.match(e.request);
+          });
+      }).catch(err => console.log(err))
+    );
+    return;
+  }
   e.respondWith(
-    caches.open(DATA_CACHE_NAME).then(cache => {
-      return fetch(e.request)
-        .then(response => {
-          // If the response was good, clone it and store it in the cache.
-          if (response.status === 200) {
-            cache.put(e.request.url, response.clone());
-          }
+    fetch(e.request).catch(function () {
+      return caches.match(e.request).then(function (response) {
+        if (response) {
           return response;
-        })
-        .catch(err => {
-          // Network request failed, try to get it from the cache.
-          return cache.match(e.request);
-        });
-    }).catch(err => console.log(err))
+        } else if (e.request.headers.get("accept").includes("text/html")) {
+          // return the cached home page for all requests for html pages
+          return caches.match("/");
+        }
+      });
+    })
   );
-  return;
- }
- e.respondWith(
-  fetch(e.request).catch(function() {
-    return caches.match(e.request).then(function(response) {
-      if (response) {
-        return response;
-      } else if (e.request.headers.get("accept").includes("text/html")) {
-        // return the cached home page for all requests for html pages
-        return caches.match("/");
-      }
-    });
-  })
- );
- })
+})
