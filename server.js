@@ -18,7 +18,6 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-dotenv.config();
 
 mongoose.connect(
   process.env.MONGO_URL,
