@@ -5,6 +5,7 @@ const compression = require("compression");
 
 const PORT = process.env.PORT || 3001;
 // const MONGODB_URI = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
 
 const app = express();
 
@@ -31,6 +32,6 @@ mongoose.connect(
 // routes
 app.use(require("./routes/api.js"));
 
-app.listen(PORT, () => {
-  console.log(`🌍 App running on port ${PORT}!`);
+app.listen(uri, () => {
+  console.log(`🌍 App is running ${uri}!`);
 });
