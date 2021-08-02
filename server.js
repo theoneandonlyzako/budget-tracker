@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 const compression = require("compression");
 
 const PORT = process.env.PORT || 3001;
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/budget";
+// const MONGODB_URI = process.env.MONGODB_URI;
 
 const app = express();
+
+const dotenv = require("dotenv");
 
 app.use(logger("dev"));
 
@@ -16,10 +18,15 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useFindAndModify: false
-});
+dotenv.config();
+
+mongoose.connect(
+  process.env.MONGO_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
+    console.log("Connected to MongoDB!");
+
+  });
 
 // routes
 app.use(require("./routes/api.js"));
